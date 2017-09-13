@@ -1,14 +1,13 @@
 package net.emptycatchblocks.libgdxclickergame;
 
 import com.badlogic.gdx.Application;
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
+
+import net.emptycatchblocks.libgdxclickergame.screen.loading.LoadingScreen;
 
 public class ClickerGame extends Game {
 	private AssetManager assetManager;
@@ -23,7 +22,7 @@ public class ClickerGame extends Game {
 
 		batch = new SpriteBatch();
 
-		setScreen(new GameScreen(this));
+		setScreen(new LoadingScreen(this));
 	}
 
 	@Override

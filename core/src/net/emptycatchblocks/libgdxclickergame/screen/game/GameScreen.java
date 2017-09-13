@@ -1,4 +1,4 @@
-package net.emptycatchblocks.libgdxclickergame;
+package net.emptycatchblocks.libgdxclickergame.screen.game;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
@@ -6,15 +6,19 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import net.emptycatchblocks.libgdxclickergame.ClickerGame;
+import net.emptycatchblocks.libgdxclickergame.assets.AssetDescriptors;
 import net.emptycatchblocks.libgdxclickergame.component.ColorComponent;
 import net.emptycatchblocks.libgdxclickergame.component.DimensionComponent;
 import net.emptycatchblocks.libgdxclickergame.component.PositionComponent;
 import net.emptycatchblocks.libgdxclickergame.config.GameConfig;
+import net.emptycatchblocks.libgdxclickergame.system.HudRenderSystem;
 import net.emptycatchblocks.libgdxclickergame.system.RenderSystem;
 import net.emptycatchblocks.libgdxclickergame.util.GdxUtils;
 
@@ -26,7 +30,9 @@ public class GameScreen implements Screen {
     private final AssetManager assetManager;
 
     private OrthographicCamera camera;
+    private OrthographicCamera hudCamera;
     private Viewport viewport;
+    private Viewport hudViewport;
     private ShapeRenderer renderer;
     private PooledEngine engine;
 
@@ -38,10 +44,13 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         camera = new OrthographicCamera();
+        hudCamera = new OrthographicCamera();
         viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
+        hudViewport = new FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, hudCamera);
         renderer = new ShapeRenderer();
         engine = new PooledEngine();
 
+        BitmapFont font = assetManager.get(AssetDescriptors.FONT);
 
         Entity stageEntity = createBox(0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, Color.RED);
         engine.addEntity(stageEntity);
@@ -49,8 +58,8 @@ public class GameScreen implements Screen {
         Entity boxEntity = createBox(2, 2, 1, 1, Color.BLUE);
         engine.addEntity(boxEntity);
 
-
         engine.addSystem(new RenderSystem(viewport, renderer));
+        engine.addSystem(new HudRenderSystem(hudViewport, game.getBatch(), font));
     }
 
     private Entity createBox(float x, float y, float width, float height, Color color) {
@@ -81,6 +90,7 @@ public class GameScreen implements Screen {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        hudViewport.update(width, height, true);
     }
 
     @Override
