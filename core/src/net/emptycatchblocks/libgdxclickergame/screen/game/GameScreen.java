@@ -20,6 +20,8 @@ import net.emptycatchblocks.libgdxclickergame.component.PositionComponent;
 import net.emptycatchblocks.libgdxclickergame.config.GameConfig;
 import net.emptycatchblocks.libgdxclickergame.system.HudRenderSystem;
 import net.emptycatchblocks.libgdxclickergame.system.RenderSystem;
+import net.emptycatchblocks.libgdxclickergame.system.input.InputProcessingSystem;
+import net.emptycatchblocks.libgdxclickergame.system.input.RawInputHandler;
 import net.emptycatchblocks.libgdxclickergame.util.GdxUtils;
 
 public class GameScreen implements Screen {
@@ -28,6 +30,7 @@ public class GameScreen implements Screen {
 
     private final ClickerGame game;
     private final AssetManager assetManager;
+    private final RawInputHandler rawInputHandler;
 
     private OrthographicCamera camera;
     private OrthographicCamera hudCamera;
@@ -39,6 +42,7 @@ public class GameScreen implements Screen {
     public GameScreen(ClickerGame game) {
         this.game = game;
         assetManager = game.getAssetManager();
+        rawInputHandler = game.getRawInputHandler();
     }
 
     @Override
@@ -58,6 +62,7 @@ public class GameScreen implements Screen {
         Entity boxEntity = createBox(2, 2, 1, 1, Color.BLUE);
         engine.addEntity(boxEntity);
 
+        engine.addSystem(new InputProcessingSystem(game));
         engine.addSystem(new RenderSystem(viewport, renderer));
         engine.addSystem(new HudRenderSystem(hudViewport, game.getBatch(), font));
     }

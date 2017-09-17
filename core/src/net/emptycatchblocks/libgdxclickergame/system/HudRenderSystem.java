@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import net.emptycatchblocks.libgdxclickergame.common.GameManager;
 import net.emptycatchblocks.libgdxclickergame.config.GameConfig;
 
 public class HudRenderSystem extends EntitySystem {
@@ -34,7 +35,7 @@ public class HudRenderSystem extends EntitySystem {
     }
 
     private void draw() {
-        String score = "SCORE: 0";
+        String score = String.format("SCORE: %s", (int) GameManager.INSTANCE.getScore());
         layout.setText(font, score);
         font.draw(batch, score,
                 20,
