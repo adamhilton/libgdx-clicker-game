@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
 
 import net.emptycatchblocks.libgdxclickergame.screen.loading.LoadingScreen;
-import net.emptycatchblocks.libgdxclickergame.system.input.RawInputHandler;
+import net.emptycatchblocks.libgdxclickergame.common.input.RawInputHandler;
 
 public class ClickerGame extends Game {
 	private AssetManager assetManager;

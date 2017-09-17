@@ -1,6 +1,8 @@
-package net.emptycatchblocks.libgdxclickergame.system.input;
+package net.emptycatchblocks.libgdxclickergame.common.input;
 
 import com.badlogic.gdx.InputAdapter;
+
+import net.emptycatchblocks.libgdxclickergame.system.InputProcessingSystem;
 
 import java.util.ArrayList;
 import java.util.List;

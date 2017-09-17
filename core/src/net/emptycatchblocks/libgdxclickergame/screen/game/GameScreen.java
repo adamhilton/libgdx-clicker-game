@@ -20,8 +20,8 @@ import net.emptycatchblocks.libgdxclickergame.component.PositionComponent;
 import net.emptycatchblocks.libgdxclickergame.config.GameConfig;
 import net.emptycatchblocks.libgdxclickergame.system.HudRenderSystem;
 import net.emptycatchblocks.libgdxclickergame.system.RenderSystem;
-import net.emptycatchblocks.libgdxclickergame.system.input.InputProcessingSystem;
-import net.emptycatchblocks.libgdxclickergame.system.input.RawInputHandler;
+import net.emptycatchblocks.libgdxclickergame.system.InputProcessingSystem;
+import net.emptycatchblocks.libgdxclickergame.common.input.RawInputHandler;
 import net.emptycatchblocks.libgdxclickergame.util.GdxUtils;
 
 public class GameScreen implements Screen {
