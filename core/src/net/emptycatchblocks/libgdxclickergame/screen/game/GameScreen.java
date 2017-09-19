@@ -6,7 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -14,12 +16,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.emptycatchblocks.libgdxclickergame.ClickerGame;
 import net.emptycatchblocks.libgdxclickergame.assets.AssetDescriptors;
+import net.emptycatchblocks.libgdxclickergame.assets.RegionNames;
+import net.emptycatchblocks.libgdxclickergame.common.AnimationState;
+import net.emptycatchblocks.libgdxclickergame.component.AnimationComponent;
 import net.emptycatchblocks.libgdxclickergame.component.ColorComponent;
 import net.emptycatchblocks.libgdxclickergame.component.DimensionComponent;
 import net.emptycatchblocks.libgdxclickergame.component.PositionComponent;
+import net.emptycatchblocks.libgdxclickergame.component.StateComponent;
+import net.emptycatchblocks.libgdxclickergame.component.TextureComponent;
 import net.emptycatchblocks.libgdxclickergame.config.GameConfig;
+import net.emptycatchblocks.libgdxclickergame.system.AnimationSystem;
 import net.emptycatchblocks.libgdxclickergame.system.HudRenderSystem;
-import net.emptycatchblocks.libgdxclickergame.system.RenderSystem;
+import net.emptycatchblocks.libgdxclickergame.system.TextureRenderSystem;
 import net.emptycatchblocks.libgdxclickergame.util.GdxUtils;
 
 public class GameScreen implements Screen {
@@ -51,14 +59,31 @@ public class GameScreen implements Screen {
         engine = new PooledEngine();
 
         BitmapFont font = assetManager.get(AssetDescriptors.FONT);
+        TextureAtlas gameplayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
 
         Entity stageEntity = createBox(0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, Color.RED);
         engine.addEntity(stageEntity);
 
-        Entity boxEntity = createBox(2, 2, 1, 1, Color.BLUE);
+        Entity boxEntity = createBox(6, 2, 3, 3, Color.BLUE);
+
+        TextureComponent textureComponent = engine.createComponent(TextureComponent.class);
+        textureComponent.region = gameplayAtlas.findRegion(RegionNames.GHOST);
+
+        AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
+        animationComponent.animations.put(AnimationState.DEFAULT, new Animation(0.0625f, gameplayAtlas.findRegions(RegionNames.GHOST), Animation.PlayMode.LOOP));
+
+        StateComponent stateComponent = engine.createComponent(StateComponent.class);
+        stateComponent.set(AnimationState.DEFAULT);
+
+        boxEntity.add(textureComponent);
+        boxEntity.add(animationComponent);
+        boxEntity.add(stateComponent);
+
         engine.addEntity(boxEntity);
 
-        engine.addSystem(new RenderSystem(viewport, renderer));
+//        engine.addSystem(new ShapeRenderSystem(viewport, renderer));
+        engine.addSystem(new AnimationSystem());
+        engine.addSystem(new TextureRenderSystem(viewport, game.getBatch()));
         engine.addSystem(new HudRenderSystem(hudViewport, game.getBatch(), font));
     }
 

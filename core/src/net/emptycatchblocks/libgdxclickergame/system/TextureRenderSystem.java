@@ -4,34 +4,31 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import net.emptycatchblocks.libgdxclickergame.common.Mappers;
-import net.emptycatchblocks.libgdxclickergame.component.ColorComponent;
 import net.emptycatchblocks.libgdxclickergame.component.DimensionComponent;
 import net.emptycatchblocks.libgdxclickergame.component.PositionComponent;
+import net.emptycatchblocks.libgdxclickergame.component.TextureComponent;
 
-
-public class RenderSystem extends EntitySystem {
+public class TextureRenderSystem extends EntitySystem {
 
     private static final Family FAMILY = Family.all(
             PositionComponent.class,
             DimensionComponent.class,
-            ColorComponent.class
+            TextureComponent.class
     ).get();
 
     private final Viewport viewport;
-    private final ShapeRenderer renderer;
+    private final Batch batch;
 
     private Array<Entity> renderQueue = new Array<Entity>();
 
-    public RenderSystem(Viewport viewport, ShapeRenderer renderer) {
+    public TextureRenderSystem(Viewport viewport, Batch batch) {
         this.viewport = viewport;
-        this.renderer = renderer;
+        this.batch = batch;
     }
 
     @Override
@@ -40,13 +37,12 @@ public class RenderSystem extends EntitySystem {
         renderQueue.addAll(entities.toArray());
 
         viewport.apply();
-
-        renderer.setProjectionMatrix(viewport.getCamera().combined);
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        batch.setProjectionMatrix(viewport.getCamera().combined);
+        batch.begin();
 
         draw();
 
-        renderer.end();
+        batch.end();
 
         renderQueue.clear();
     }
@@ -55,11 +51,10 @@ public class RenderSystem extends EntitySystem {
         for (Entity entity : renderQueue) {
             PositionComponent position = Mappers.POSITION.get(entity);
             DimensionComponent dimension = Mappers.DIMENSION.get(entity);
-            ColorComponent colorComponent = Mappers.COLOR.get(entity);
+            TextureComponent texture = Mappers.TEXTURE.get(entity);
 
-            renderer.setColor(colorComponent.color);
-
-            renderer.rect(
+            batch.draw(
+                    texture.region,
                     position.x,
                     position.y,
                     dimension.width,
