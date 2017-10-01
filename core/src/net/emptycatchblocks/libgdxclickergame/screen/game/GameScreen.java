@@ -30,21 +30,26 @@ import net.emptycatchblocks.libgdxclickergame.system.HudRenderSystem;
 import net.emptycatchblocks.libgdxclickergame.system.InputProcessingSystem;
 import net.emptycatchblocks.libgdxclickergame.common.input.RawInputHandler;
 import net.emptycatchblocks.libgdxclickergame.system.TextureRenderSystem;
+import net.emptycatchblocks.libgdxclickergame.system.debug.DebugCameraSystem;
+import net.emptycatchblocks.libgdxclickergame.system.debug.GridRenderSystem;
 import net.emptycatchblocks.libgdxclickergame.util.GdxUtils;
 
 public class GameScreen implements Screen {
 
     private static final Logger log = new Logger(GameScreen.class.getName(), Logger.DEBUG);
 
+    private final boolean isDebug = true;
+
     private final ClickerGame game;
     private final AssetManager assetManager;
-    private final RawInputHandler rawInputHandler;
 
+    private final RawInputHandler rawInputHandler;
     private OrthographicCamera camera;
     private OrthographicCamera hudCamera;
     private Viewport viewport;
     private Viewport hudViewport;
     private ShapeRenderer renderer;
+
     private PooledEngine engine;
 
     public GameScreen(ClickerGame game) {
@@ -65,13 +70,25 @@ public class GameScreen implements Screen {
         BitmapFont font = assetManager.get(AssetDescriptors.FONT);
         TextureAtlas gameplayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
 
-        Entity stageEntity = createBox(0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, Color.RED);
-        engine.addEntity(stageEntity);
+        createStage(gameplayAtlas);
+        createGhost(gameplayAtlas);
 
-        Entity boxEntity = createBox(6, 2, 3, 3, Color.BLUE);
+        engine.addSystem(new InputProcessingSystem(game));
+        engine.addSystem(new AnimationSystem());
+        engine.addSystem(new TextureRenderSystem(viewport, game.getBatch()));
+        engine.addSystem(new HudRenderSystem(hudViewport, game.getBatch(), font));
 
-        TextureComponent textureComponent = engine.createComponent(TextureComponent.class);
-        textureComponent.region = gameplayAtlas.findRegion(RegionNames.GHOST);
+        if (isDebug) {
+            engine.addSystem(new DebugCameraSystem(camera, GameConfig.WORLD_CENTER_X, GameConfig.WORLD_CENTER_Y));
+            engine.addSystem(new GridRenderSystem(viewport, renderer));
+        }
+    }
+
+    private void createGhost(TextureAtlas gameplayAtlas) {
+        Entity boxEntity = createBox(6, 2, GameConfig.GHOST_WIDTH, GameConfig.GHOST_HEIGHT, Color.BLUE);
+
+        TextureComponent ghostTextureComponent = engine.createComponent(TextureComponent.class);
+        ghostTextureComponent.region = gameplayAtlas.findRegion(RegionNames.GHOST);
 
         AnimationComponent animationComponent = engine.createComponent(AnimationComponent.class);
         animationComponent.animations.put(AnimationState.DEFAULT, new Animation(0.0625f, gameplayAtlas.findRegions(RegionNames.GHOST), Animation.PlayMode.LOOP));
@@ -79,16 +96,22 @@ public class GameScreen implements Screen {
         StateComponent stateComponent = engine.createComponent(StateComponent.class);
         stateComponent.set(AnimationState.DEFAULT);
 
-        boxEntity.add(textureComponent);
+        boxEntity.add(ghostTextureComponent);
         boxEntity.add(animationComponent);
         boxEntity.add(stateComponent);
 
         engine.addEntity(boxEntity);
+    }
 
-        engine.addSystem(new InputProcessingSystem(game));
-        engine.addSystem(new AnimationSystem());
-        engine.addSystem(new TextureRenderSystem(viewport, game.getBatch()));
-        engine.addSystem(new HudRenderSystem(hudViewport, game.getBatch(), font));
+    private void createStage(TextureAtlas gameplayAtlas) {
+        Entity stageEntity = createBox(0, 0, GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, Color.RED);
+
+        TextureComponent backgroundTextureComponent = engine.createComponent(TextureComponent.class);
+        backgroundTextureComponent.region = gameplayAtlas.findRegion(RegionNames.BACKGROUND);
+
+        stageEntity.add(backgroundTextureComponent);
+
+        engine.addEntity(stageEntity);
     }
 
     private Entity createBox(float x, float y, float width, float height, Color color) {
